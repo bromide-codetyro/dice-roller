@@ -21,8 +21,8 @@ export class DifficultyDie extends BaseDie {
       DieSymbol.DOUBLE_FAILURE,
       DieSymbol.THREAT,
       DieSymbol.THREAT,
-      DieSymbol.SUCCESS_THREAT,
-      DieSymbol.DOUBLE_THREAT,
+      DieSymbol.FAILURE_THREAT,
+      DieSymbol.DOUBLE_THREAT
     ];
   }
 

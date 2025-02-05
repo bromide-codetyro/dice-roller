@@ -109,7 +109,9 @@ export class DicePool extends LitElement {
   summarizeResults() {
     const summary = {
       success: 0,
+      failure: 0,
       advantage: 0,
+      threat: 0,
       triumph: 0,
       despair: 0,
       lightside: 0,
@@ -121,16 +123,16 @@ export class DicePool extends LitElement {
       die.result.forEach(symbol => {
         switch(symbol) {
           case 's': summary.success++; break;
-          case 'f': summary.success--; break;
+          case 'f': summary.failure++; break;
           case 'a': summary.advantage++; break;
-          case 't': summary.advantage--; break;
+          case 't': summary.threat++; break;
           case 'x':
             summary.triumph++;
             summary.success++;
             break;
           case 'y':
             summary.despair++;
-            summary.success--;
+            summary.failure++;
             break;
           case 'Z': summary.lightside++; break;
           case 'z': summary.darkside++; break;
@@ -138,6 +140,10 @@ export class DicePool extends LitElement {
       });
     });
 
+    // Calculate net successes/failures and advantages/threats
+    summary.netSuccess = summary.success - summary.failure;
+    summary.netAdvantage = summary.advantage - summary.threat;
+    
     return summary;
   }
 
@@ -159,16 +165,16 @@ export class DicePool extends LitElement {
             ${summary.despair}<span>y</span>
           </div>
         ` : ''}
-        ${summary.success !== 0 ? html`
+        ${summary.netSuccess !== 0 ? html`
           <div class="result-group">
-            ${Math.abs(summary.success)}
-            <span>${summary.success > 0 ? 's' : 'f'}</span>
+            ${Math.abs(summary.netSuccess)}
+            <span>${summary.netSuccess > 0 ? 's' : 'f'}</span>
           </div>
         ` : ''}
-        ${summary.advantage !== 0 ? html`
+        ${summary.netAdvantage !== 0 ? html`
           <div class="result-group">
-            ${Math.abs(summary.advantage)}
-            <span>${summary.advantage > 0 ? 'a' : 't'}</span>
+            ${Math.abs(summary.netAdvantage)}
+            <span>${summary.netAdvantage > 0 ? 'a' : 't'}</span>
           </div>
         ` : ''}
         ${summary.lightside > 0 ? html`

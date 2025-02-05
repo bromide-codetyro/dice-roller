@@ -22,7 +22,7 @@ export class AbilityDie extends BaseDie {
       DieSymbol.ADVANTAGE,
       DieSymbol.ADVANTAGE,
       DieSymbol.SUCCESS_ADVANTAGE,
-      DieSymbol.DOUBLE_ADVANTAGE,
+      DieSymbol.DOUBLE_ADVANTAGE
     ];
   }
 

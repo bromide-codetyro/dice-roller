@@ -20,7 +20,7 @@ export class BoostDie extends BaseDie {
       DieSymbol.SUCCESS,
       DieSymbol.SUCCESS_ADVANTAGE,
       DieSymbol.ADVANTAGE,
-      DieSymbol.DOUBLE_ADVANTAGE,
+      DieSymbol.DOUBLE_ADVANTAGE
     ];
   }
 

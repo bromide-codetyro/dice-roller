@@ -20,7 +20,7 @@ export class SetbackDie extends BaseDie {
       DieSymbol.FAILURE,
       DieSymbol.FAILURE_THREAT,
       DieSymbol.THREAT,
-      DieSymbol.DOUBLE_THREAT,
+      DieSymbol.DOUBLE_THREAT
     ];
   }
 

@@ -29,7 +29,7 @@ export class AbilityDie extends BaseDie {
   render() {
     return html`
       <div class="die diamond ${this.rolling ? 'rolling' : ''} ${this.static ? 'static' : ''}">
-        ${this.result || DieSymbol.SUCCESS}
+        ${this.result || (this.count > 0 ? this.count : DieSymbol.SUCCESS)}
       </div>
     `;
   }

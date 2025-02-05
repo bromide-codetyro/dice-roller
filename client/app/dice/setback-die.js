@@ -27,7 +27,7 @@ export class SetbackDie extends BaseDie {
   render() {
     return html`
       <div class="die square ${this.rolling ? 'rolling' : ''} ${this.static ? 'static' : ''}">
-        ${this.result || DieSymbol.THREAT}
+        ${this.result || (this.count > 0 ? this.count : DieSymbol.THREAT)}
       </div>
     `;
   }

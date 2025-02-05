@@ -27,7 +27,7 @@ export class BoostDie extends BaseDie {
   render() {
     return html`
       <div class="die square ${this.rolling ? 'rolling' : ''} ${this.static ? 'static' : ''}">
-        ${this.result || DieSymbol.ADVANTAGE}
+        ${this.result || (this.count > 0 ? this.count : DieSymbol.ADVANTAGE)}
       </div>
     `;
   }

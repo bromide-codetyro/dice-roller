@@ -33,7 +33,7 @@ export class ChallengeDie extends BaseDie {
   render() {
     return html`
       <div class="die hexagon ${this.rolling ? 'rolling' : ''} ${this.static ? 'static' : ''}">
-        ${this.result || DieSymbol.DESPAIR}
+        ${this.result || (this.count > 0 ? this.count : DieSymbol.DESPAIR)}
       </div>
     `;
   }

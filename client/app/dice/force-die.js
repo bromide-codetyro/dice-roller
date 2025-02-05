@@ -50,7 +50,7 @@ export class ForceDie extends BaseDie {
 
     return html`
       <div class="die hexagon ${this.rolling ? 'rolling' : ''} ${this.static ? 'static' : ''}">
-        ${this.result ? renderSymbol(this.result) : DieSymbol.LIGHT}
+        ${this.result ? renderSymbol(this.result) : (this.count > 0 ? this.count : DieSymbol.LIGHT)}
       </div>
     `;
   }

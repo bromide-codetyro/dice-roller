@@ -7,7 +7,8 @@ export class BaseDie extends LitElement {
     rolling: { type: Boolean },
     static: { type: Boolean },
     result: { type: String },
-    id: { type: Number }
+    id: { type: Number },
+    count: { type: Number }
   };
 
   static styles = css`
@@ -21,6 +22,23 @@ export class BaseDie extends LitElement {
       display: inline-block;
       cursor: pointer;
       user-select: none;
+      position: relative;
+    }
+
+    .count {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: white;
+      color: black;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-family: Arial, sans-serif;
     }
     
     .die {
@@ -68,6 +86,7 @@ export class BaseDie extends LitElement {
     this.rolling = false;
     this.static = false;
     this.id = BaseDie.nextId++;
+    this.count = 0;
   }
 
   roll() {
@@ -96,4 +115,6 @@ export class BaseDie extends LitElement {
   getFaces() {
     return [];
   }
+
+
 }

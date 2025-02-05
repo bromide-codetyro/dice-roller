@@ -192,18 +192,22 @@ class Rolls extends LitElement {
     });
   }
 
+  getDiceCount(type) {
+    return this.poolDice.filter(die => die.type === type).length;
+  }
+
   render() {
     const hasPool = this.poolDice.length > 0;
     
     return html`
         <div class="die-selector">
-            <sw-challenge-die .static=${true} @click=${(e) => this.handleDieClick('challenge', e)}></sw-challenge-die>
-            <sw-difficulty-die .static=${true} @click=${(e) => this.handleDieClick('difficulty', e)}></sw-difficulty-die>
-            <sw-setback-die .static=${true} @click=${(e) => this.handleDieClick('setback', e)}></sw-setback-die>
-            <sw-proficiency-die .static=${true} @click=${(e) => this.handleDieClick('proficiency', e)}></sw-proficiency-die>
-            <sw-ability-die .static=${true} @click=${(e) => this.handleDieClick('ability', e)}></sw-ability-die>
-            <sw-boost-die .static=${true} @click=${(e) => this.handleDieClick('boost', e)}></sw-boost-die>
-            <sw-force-die .static=${true} @click=${(e) => this.handleDieClick('force', e)}></sw-force-die>
+            <sw-challenge-die .static=${true} .count=${this.getDiceCount('challenge')} @click=${(e) => this.handleDieClick('challenge', e)}></sw-challenge-die>
+            <sw-difficulty-die .static=${true} .count=${this.getDiceCount('difficulty')} @click=${(e) => this.handleDieClick('difficulty', e)}></sw-difficulty-die>
+            <sw-setback-die .static=${true} .count=${this.getDiceCount('setback')} @click=${(e) => this.handleDieClick('setback', e)}></sw-setback-die>
+            <sw-proficiency-die .static=${true} .count=${this.getDiceCount('proficiency')} @click=${(e) => this.handleDieClick('proficiency', e)}></sw-proficiency-die>
+            <sw-ability-die .static=${true} .count=${this.getDiceCount('ability')} @click=${(e) => this.handleDieClick('ability', e)}></sw-ability-die>
+            <sw-boost-die .static=${true} .count=${this.getDiceCount('boost')} @click=${(e) => this.handleDieClick('boost', e)}></sw-boost-die>
+            <sw-force-die .static=${true} .count=${this.getDiceCount('force')} @click=${(e) => this.handleDieClick('force', e)}></sw-force-die>
         </div>
 
         <div class="pool-container">

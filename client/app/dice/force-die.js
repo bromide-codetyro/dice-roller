@@ -9,7 +9,6 @@ export class ForceDie extends BaseDie {
       .die {
         background-color: white;
         color: black;
-        border: 2px solid #cccccc;
       }
       .double-symbol {
         display: flex;

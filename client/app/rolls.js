@@ -98,14 +98,21 @@ class Rolls extends LitElement {
   constructor() {
     super();
     this.rolling = false;
+    this.poolDice = [];
+  }
+  
+  connectedCallback() {
+    super.connectedCallback();
     
     // Load saved pool from localStorage
     try {
       const savedPool = localStorage.getItem('currentPool');
-      this.poolDice = savedPool ? JSON.parse(savedPool) : [];
+      if (savedPool) {
+        this.poolDice = JSON.parse(savedPool);
+        this.requestUpdate();
+      }
     } catch (e) {
       console.error('Error loading pool:', e);
-      this.poolDice = [];
     }
   }
 
@@ -177,6 +184,9 @@ class Rolls extends LitElement {
             ...poolDie,
             result: Array.from(dice)[index].result
           }));
+          
+          // Save the updated pool to localStorage
+          this.savePool();
 
           this.dispatchEvent(new CustomEvent('dice-rolled', {
             detail: { rolls: rollResults }

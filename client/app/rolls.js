@@ -24,6 +24,13 @@ class Rolls extends LitElement {
     .die-selector > * {
       cursor: pointer;
       user-select: none;
+      transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+    }
+    
+    .die-selector.rolling > * {
+      cursor: not-allowed;
+      opacity: 0.5;
+      transform: scale(0.95);
     }
 
     .pool-container {
@@ -230,6 +237,8 @@ class Rolls extends LitElement {
   handleDieClick(type, e) {
     e.preventDefault();
     e.stopPropagation();
+    // Prevent adding dice while rolling is in progress
+    if (this.rolling) return;
     this.poolDice = [...this.poolDice, { type, id: Math.random() }];
     this.savePool();
     this.requestUpdate();
@@ -365,7 +374,7 @@ class Rolls extends LitElement {
     const hasPool = this.poolDice.length > 0;
     
     return html`
-        <div class="die-selector">
+        <div class="die-selector ${this.rolling ? 'rolling' : ''}">
             <sw-challenge-die .static=${true} .count=${this.getDiceCount('challenge')} @click=${(e) => this.handleDieClick('challenge', e)}></sw-challenge-die>
             <sw-difficulty-die .static=${true} .count=${this.getDiceCount('difficulty')} @click=${(e) => this.handleDieClick('difficulty', e)}></sw-difficulty-die>
             <sw-setback-die .static=${true} .count=${this.getDiceCount('setback')} @click=${(e) => this.handleDieClick('setback', e)}></sw-setback-die>

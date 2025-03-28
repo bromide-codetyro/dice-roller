@@ -203,7 +203,7 @@ export class DicePool extends LitElement {
             ${summary.lightside}
             ${this.showSymbolNames
               ? html`<span class="name">${getSymbolName('Z')}</span>`
-              : html`<span class="symbol">Z</span>`
+              : html`<span class="symbol">z</span>`
             }
           </div>
         ` : ''}
@@ -212,7 +212,7 @@ export class DicePool extends LitElement {
             ${summary.darkside}
             ${this.showSymbolNames
               ? html`<span class="name">${getSymbolName('z')}</span>`
-              : html`<span class="symbol">z</span>`
+              : html`<span class="symbol">Z</span>`
             }
           </div>
         ` : ''}

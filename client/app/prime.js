@@ -19,29 +19,32 @@ class Prime extends LitElement {
 
   constructor() {
     super();
-    this.history = [];
-  }
-  
-  connectedCallback() {
-    super.connectedCallback();
     
     // Load history from localStorage
     try {
       const savedHistory = localStorage.getItem('diceHistory');
-      if (savedHistory) {
-        this.history = JSON.parse(savedHistory);
-        this.requestUpdate();
-      }
+      this.history = savedHistory ? JSON.parse(savedHistory) : [];
     } catch (e) {
       console.error('Error loading history:', e);
+      this.history = [];
+    }
+
+    // Load current dice pool from localStorage
+    try {
+      const savedPool = localStorage.getItem('currentPool');
+      this.currentPool = savedPool ? JSON.parse(savedPool) : [];
+    } catch (e) {
+      console.error('Error loading pool:', e);
+      this.currentPool = [];
     }
   }
 
   saveState() {
     try {
       localStorage.setItem('diceHistory', JSON.stringify(this.history));
+      localStorage.setItem('currentPool', JSON.stringify(this.currentPool));
     } catch (e) {
-      console.error('Error saving history:', e);
+      console.error('Error saving state:', e);
     }
   }
 

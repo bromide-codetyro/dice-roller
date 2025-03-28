@@ -98,21 +98,14 @@ class Rolls extends LitElement {
   constructor() {
     super();
     this.rolling = false;
-    this.poolDice = [];
-  }
-  
-  connectedCallback() {
-    super.connectedCallback();
     
     // Load saved pool from localStorage
     try {
       const savedPool = localStorage.getItem('currentPool');
-      if (savedPool) {
-        this.poolDice = JSON.parse(savedPool);
-        this.requestUpdate();
-      }
+      this.poolDice = savedPool ? JSON.parse(savedPool) : [];
     } catch (e) {
       console.error('Error loading pool:', e);
+      this.poolDice = [];
     }
   }
 
@@ -154,23 +147,63 @@ class Rolls extends LitElement {
     const rollResults = [];
     const dieResults = new Map(); // Map to store die elements and their results
     const listeners = [];
+    const diceArray = Array.from(dice);
+    
+    // Create a mapping between die elements and poolDice entries
+    const dieToPoolMapping = new Map();
+    
+    // We'll map the dice elements to pool dice entries based on their type and position
+    // This creates a more reliable mapping than using array indices
+    const typeCounters = {
+      'SW-ABILITY-DIE': 0,
+      'SW-PROFICIENCY-DIE': 0,
+      'SW-BOOST-DIE': 0,
+      'SW-DIFFICULTY-DIE': 0,
+      'SW-CHALLENGE-DIE': 0,
+      'SW-SETBACK-DIE': 0,
+      'SW-FORCE-DIE': 0
+    };
+    
+    const typeMap = {
+      'SW-ABILITY-DIE': 'ability',
+      'SW-PROFICIENCY-DIE': 'proficiency',
+      'SW-BOOST-DIE': 'boost',
+      'SW-DIFFICULTY-DIE': 'difficulty',
+      'SW-CHALLENGE-DIE': 'challenge',
+      'SW-SETBACK-DIE': 'setback',
+      'SW-FORCE-DIE': 'force'
+    };
+    
+    // First, build the mapping between die elements and poolDice entries
+    diceArray.forEach(die => {
+      const type = typeMap[die.tagName];
+      const position = typeCounters[die.tagName]++;
+      
+      // Find the corresponding pool die of the same type at the same position
+      const poolDieIndex = this.poolDice.findIndex((poolDie, index) => {
+        // Find dice of the same type
+        if (poolDie.type === type) {
+          // Count previous dice of this type to determine position
+          const prevCount = this.poolDice.slice(0, index).filter(pd => pd.type === type).length;
+          return prevCount === position;
+        }
+        return false;
+      });
+      
+      if (poolDieIndex !== -1) {
+        dieToPoolMapping.set(die, poolDieIndex);
+      }
+    });
 
-    dice.forEach(die => {
-      const typeMap = {
-        'SW-ABILITY-DIE': 'ability',
-        'SW-PROFICIENCY-DIE': 'proficiency',
-        'SW-BOOST-DIE': 'boost',
-        'SW-DIFFICULTY-DIE': 'difficulty',
-        'SW-CHALLENGE-DIE': 'challenge',
-        'SW-SETBACK-DIE': 'setback',
-        'SW-FORCE-DIE': 'force'
-      };
-
+    diceArray.forEach(die => {
       const listener = (event) => {
-        dieResults.set(die, event.detail.result);
+        const type = typeMap[die.tagName];
+        const result = event.detail.result;
+        dieResults.set(die, result);
+        
         rollResults.push({
-          type: typeMap[die.tagName],
-          result: event.detail.result,
+          type: type,
+          result: result,
           id: Math.random()
         });
 
@@ -179,13 +212,19 @@ class Rolls extends LitElement {
           listeners.forEach(v => v.die.removeEventListener('roll-complete', v.listener));
           this.rolling = false;
           
-          // Update poolDice with results while preserving IDs
-          this.poolDice = this.poolDice.map((poolDie, index) => ({
-            ...poolDie,
-            result: Array.from(dice)[index].result
-          }));
+          // Update poolDice with results using our mapping
+          const updatedDice = [...this.poolDice];
+          dieResults.forEach((result, dieElement) => {
+            const poolIndex = dieToPoolMapping.get(dieElement);
+            if (poolIndex !== undefined) {
+              updatedDice[poolIndex] = {
+                ...updatedDice[poolIndex],
+                result: result
+              };
+            }
+          });
           
-          // Save the updated pool to localStorage
+          this.poolDice = updatedDice;
           this.savePool();
 
           this.dispatchEvent(new CustomEvent('dice-rolled', {

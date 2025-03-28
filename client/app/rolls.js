@@ -5,7 +5,8 @@ class Rolls extends LitElement {
   static properties = {
     rolling: { type: Boolean },
     poolDice: { type: Array },
-    showSymbolNames: { type: Boolean }
+    showSymbolNames: { type: Boolean },
+    poolUpdated: { type: Boolean }
   };
 
   static styles = css`
@@ -19,6 +20,38 @@ class Rolls extends LitElement {
       flex-wrap: wrap;
       border: 1px solid #3a3a3a;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .pool-updated-indicator {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(51, 204, 51, 0.2);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      animation: fade-out 1.5s ease-out forwards;
+      pointer-events: none;
+      z-index: 10;
+    }
+    
+    .update-text {
+      background: rgba(51, 204, 51, 0.8);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 4px;
+      font-weight: bold;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    }
+    
+    @keyframes fade-out {
+      0% { opacity: 1; }
+      70% { opacity: 1; }
+      100% { opacity: 0; }
     }
 
     .die-selector > * {
@@ -149,6 +182,7 @@ class Rolls extends LitElement {
     this.rolling = false;
     this.poolDice = [];
     this.showSymbolNames = false;
+    this.poolUpdated = false;
     
     // We'll load the pool in connectedCallback for better reliability
   }
@@ -232,6 +266,29 @@ class Rolls extends LitElement {
     } catch (e) {
       console.error('Error saving pool:', e);
     }
+  }
+
+  updateDiceFromHistory(rolls) {
+    // Create a new dice pool from the history entry rolls
+    // We need to generate new IDs for the dice to avoid conflicts
+    this.poolDice = rolls.map(roll => ({
+      type: roll.type,
+      id: Math.random(),
+      // Don't include result as we want a fresh roll
+    }));
+    
+    // Save the updated pool
+    this.savePool();
+    
+    // Show a visual indication that the pool was updated
+    this.poolUpdated = true;
+    setTimeout(() => {
+      this.poolUpdated = false;
+      this.requestUpdate();
+    }, 1500);
+    
+    // Force UI update
+    this.requestUpdate();
   }
 
   handleDieClick(type, e) {
@@ -375,6 +432,11 @@ class Rolls extends LitElement {
     
     return html`
         <div class="die-selector ${this.rolling ? 'rolling' : ''}">
+            ${this.poolUpdated ? html`
+              <div class="pool-updated-indicator">
+                <div class="update-text">Dice Pool Updated!</div>
+              </div>
+            ` : ''}
             <sw-challenge-die .static=${true} .count=${this.getDiceCount('challenge')} @click=${(e) => this.handleDieClick('challenge', e)}></sw-challenge-die>
             <sw-difficulty-die .static=${true} .count=${this.getDiceCount('difficulty')} @click=${(e) => this.handleDieClick('difficulty', e)}></sw-difficulty-die>
             <sw-setback-die .static=${true} .count=${this.getDiceCount('setback')} @click=${(e) => this.handleDieClick('setback', e)}></sw-setback-die>

@@ -125,6 +125,15 @@ class Prime extends LitElement {
     this.saveState();
     this.requestUpdate();
   }
+  
+  handleReuseHistoryEntry(e) {
+    const rolls = e.detail.rolls;
+    // Forward the event to the rolls component
+    const rollsComponent = this.shadowRoot.querySelector('c-rolls');
+    if (rollsComponent) {
+      rollsComponent.updateDiceFromHistory(rolls);
+    }
+  }
 
   firstUpdated() {
     // When the component is first updated, make sure the dice-roller loads its state
@@ -173,7 +182,8 @@ class Prime extends LitElement {
         <c-history 
           .history=${this.history}
           .showSymbolNames=${this.showSymbolNames}
-          @clear-history=${this.handleHistoryClear}>
+          @clear-history=${this.handleHistoryClear}
+          @reuse-history-entry=${this.handleReuseHistoryEntry}>
         </c-history>
       </div>
     `;

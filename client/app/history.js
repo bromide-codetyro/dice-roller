@@ -78,6 +78,32 @@ class History extends LitElement {
       border-radius: 4px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
       border: 1px solid #3a3a3a;
+      position: relative;
+    }
+    
+    .history-entry-actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 10px;
+    }
+    
+    .reuse-button {
+      padding: 6px 12px;
+      font-size: 0.9em;
+      background-color: #336699;
+      color: #e0e0e0;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
+    }
+    
+    .reuse-button:hover {
+      background-color: #4477aa;
+      box-shadow: 0 0 10px rgba(51, 102, 153, 0.4);
+      transform: translateY(-1px);
     }
   `;
 
@@ -92,6 +118,20 @@ class History extends LitElement {
       bubbles: true,
       composed: true
     }));
+  }
+  
+  reuseHistoryEntry(entry) {
+    this.dispatchEvent(new CustomEvent('reuse-history-entry', {
+      bubbles: true,
+      composed: true,
+      detail: { rolls: entry.rolls }
+    }));
+    
+    // Target the dice roller component for scrolling
+    document.querySelector('c-prime').shadowRoot.querySelector('#dice-roller').scrollIntoView({
+      behavior: 'smooth',
+      block: 'start'
+    });
   }
 
   render() {
@@ -117,6 +157,12 @@ class History extends LitElement {
                   .static=${true}
                   .showSymbolNames=${this.showSymbolNames}
                 ></dice-pool>
+                <div class="history-entry-actions">
+                  <button 
+                    class="reuse-button" 
+                    @click=${() => this.reuseHistoryEntry(entry)}
+                  >Re-use</button>
+                </div>
               </div>
             `)}
           </div>`

@@ -48,15 +48,6 @@ class Prime extends LitElement {
       console.error('Error loading history:', e);
       this.history = [];
     }
-
-    // Load current dice pool from localStorage
-    try {
-      const savedPool = localStorage.getItem('currentPool');
-      this.currentPool = savedPool ? JSON.parse(savedPool) : [];
-    } catch (e) {
-      console.error('Error loading pool:', e);
-      this.currentPool = [];
-    }
     
     // Generate bright stars
     this.brightStars = this.generateBrightStars(15);
@@ -80,7 +71,6 @@ class Prime extends LitElement {
   saveState() {
     try {
       localStorage.setItem('diceHistory', JSON.stringify(this.history));
-      localStorage.setItem('currentPool', JSON.stringify(this.currentPool));
     } catch (e) {
       console.error('Error saving state:', e);
     }
@@ -102,6 +92,32 @@ class Prime extends LitElement {
     this.requestUpdate();
   }
 
+  firstUpdated() {
+    // When the component is first updated, make sure the dice-roller loads its state
+    // Check if the page is already loaded (if we're coming from a SPA navigation)
+    if (document.readyState === 'complete') {
+      this._initializeRollsComponent();
+    } else {
+      // Wait for the window load event if the page is still loading
+      window.addEventListener('load', () => {
+        console.log('Prime component: Window loaded event triggered');
+        this._initializeRollsComponent();
+      });
+    }
+  }
+  
+  _initializeRollsComponent() {
+    // Find the c-rolls component and trigger a load
+    const rollsComponent = this.shadowRoot.querySelector('c-rolls');
+    if (rollsComponent && typeof rollsComponent.loadPoolFromStorage === 'function') {
+      // If component is available, tell it to refresh its state
+      rollsComponent.loadPoolFromStorage();
+    } else {
+      // If the component isn't ready yet, try again in a moment
+      setTimeout(() => this._initializeRollsComponent(), 100);
+    }
+  }
+
   render() {
     return html`
       <!-- Bright stars in the background -->
@@ -119,7 +135,7 @@ class Prime extends LitElement {
       `)}
       
       <div class="container">
-        <c-rolls @dice-rolled=${this.handleRoll}></c-rolls>
+        <c-rolls id="dice-roller" @dice-rolled=${this.handleRoll}></c-rolls>
         <c-history 
           .history=${this.history}
           @clear-history=${this.handleHistoryClear}>

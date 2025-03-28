@@ -98,20 +98,87 @@ class Rolls extends LitElement {
   constructor() {
     super();
     this.rolling = false;
+    this.poolDice = [];
     
-    // Load saved pool from localStorage
+    // We'll load the pool in connectedCallback for better reliability
+  }
+  
+  connectedCallback() {
+    super.connectedCallback();
+    
+    // Load saved pool from localStorage when component is connected to DOM
+    this.loadPoolFromStorage();
+    
+    // Add window storage event listener to update if localStorage changes in another tab
+    window.addEventListener('storage', (event) => {
+      if (event.key === 'currentPool') {
+        this.loadPoolFromStorage();
+      }
+    });
+    
+    // Add a load event listener to ensure pool is loaded on refresh
+    window.addEventListener('load', () => {
+      console.log('Rolls component: Window load event triggered');
+      this.loadPoolFromStorage();
+    });
+    
+    // Add a beforeunload event to save the state before the page unloads
+    window.addEventListener('beforeunload', () => {
+      console.log('Saving pool before page unload');
+      this.savePool();
+    });
+    
+    // Save the pool periodically, every 10 seconds
+    this.saveInterval = setInterval(() => {
+      if (this.poolDice.length > 0) {
+        this.savePool();
+      }
+    }, 10000);
+  }
+  
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    // Clean up the interval when the component is disconnected
+    if (this.saveInterval) {
+      clearInterval(this.saveInterval);
+    }
+  }
+  
+  loadPoolFromStorage() {
     try {
       const savedPool = localStorage.getItem('currentPool');
-      this.poolDice = savedPool ? JSON.parse(savedPool) : [];
+      if (savedPool) {
+        this.poolDice = JSON.parse(savedPool);
+        console.log('Loaded dice pool from storage, dice count:', this.poolDice.length);
+        
+        // Force an update of the component
+        this.requestUpdate();
+        
+        // Ensure any dice with results are displayed correctly
+        setTimeout(() => {
+          // Try to get the dice-pool component and force it to update
+          const dicePool = this.shadowRoot.querySelector('dice-pool');
+          if (dicePool) {
+            dicePool.requestUpdate();
+          }
+        }, 100);
+      }
     } catch (e) {
       console.error('Error loading pool:', e);
-      this.poolDice = [];
     }
   }
 
   savePool() {
     try {
-      localStorage.setItem('currentPool', JSON.stringify(this.poolDice));
+      // Save the current pool to localStorage
+      const poolJSON = JSON.stringify(this.poolDice);
+      localStorage.setItem('currentPool', poolJSON);
+      
+      // Add a timestamp to track when the pool was last saved
+      localStorage.setItem('poolLastSaved', Date.now().toString());
+      
+      // Log the save for debugging
+      console.log('Dice pool saved, dice count:', this.poolDice.length);
     } catch (e) {
       console.error('Error saving pool:', e);
     }
@@ -225,13 +292,19 @@ class Rolls extends LitElement {
           });
           
           this.poolDice = updatedDice;
-          this.savePool();
+          this.savePool(); // Save to localStorage
 
           this.dispatchEvent(new CustomEvent('dice-rolled', {
             detail: { rolls: rollResults }
           }));
           
           this.requestUpdate();
+          
+          // Double-check that the pool is saved to localStorage after a short delay
+          // This ensures it's saved even if there's any race condition
+          setTimeout(() => {
+            this.savePool();
+          }, 100);
         }
       };
 

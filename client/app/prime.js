@@ -14,6 +14,26 @@ class Prime extends LitElement {
       margin: 0 auto;
       min-height: 100vh;
       color: #e0e0e0;
+      position: relative;
+      z-index: 1;
+      background-color: rgba(26, 26, 26, 0.7);
+      border-radius: 8px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(3px);
+    }
+    
+    /* Additional star effect for larger, brighter stars */
+    .bright-star {
+      position: absolute;
+      background-color: white;
+      border-radius: 50%;
+      filter: blur(0.5px);
+      animation: twinkle-star var(--duration) ease-in-out infinite alternate;
+    }
+    
+    @keyframes twinkle-star {
+      0% { opacity: 0.3; transform: scale(0.8); }
+      100% { opacity: 1; transform: scale(1); }
     }
   `;
 
@@ -37,6 +57,24 @@ class Prime extends LitElement {
       console.error('Error loading pool:', e);
       this.currentPool = [];
     }
+    
+    // Generate bright stars
+    this.brightStars = this.generateBrightStars(15);
+  }
+  
+  // Generate random bright stars
+  generateBrightStars(count) {
+    const stars = [];
+    for (let i = 0; i < count; i++) {
+      stars.push({
+        size: Math.random() * 3 + 2, // 2-5px
+        top: Math.random() * 100,    // 0-100%
+        left: Math.random() * 100,   // 0-100%
+        duration: Math.random() * 3 + 2 + 's', // 2-5s
+        delay: Math.random() * 5 + 's'  // 0-5s delay
+      });
+    }
+    return stars;
   }
 
   saveState() {
@@ -66,6 +104,20 @@ class Prime extends LitElement {
 
   render() {
     return html`
+      <!-- Bright stars in the background -->
+      ${this.brightStars.map(star => html`
+        <div class="bright-star" 
+          style="
+            width: ${star.size}px; 
+            height: ${star.size}px; 
+            top: ${star.top}%; 
+            left: ${star.left}%; 
+            --duration: ${star.duration};
+            animation-delay: ${star.delay};
+          ">
+        </div>
+      `)}
+      
       <div class="container">
         <c-rolls @dice-rolled=${this.handleRoll}></c-rolls>
         <c-history 

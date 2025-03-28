@@ -4,7 +4,8 @@ import './dice/dice-pool.js';
 class Rolls extends LitElement {
   static properties = {
     rolling: { type: Boolean },
-    poolDice: { type: Array }
+    poolDice: { type: Array },
+    showSymbolNames: { type: Boolean }
   };
 
   static styles = css`
@@ -37,7 +38,15 @@ class Rolls extends LitElement {
     .action-buttons {
       display: flex;
       gap: 10px;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .center-buttons {
+      display: flex;
+      gap: 10px;
       justify-content: center;
+      flex-grow: 1;
     }
 
     .action-button {
@@ -86,6 +95,17 @@ class Rolls extends LitElement {
       cursor: not-allowed;
       box-shadow: none;
     }
+    
+    .toggle-button {
+      background-color: #336699;
+      color: #e0e0e0;
+    }
+
+    .toggle-button:hover {
+      background-color: #4477aa;
+      box-shadow: 0 0 15px rgba(51, 102, 153, 0.3);
+      transform: translateY(-1px);
+    }
 
     .empty-pool {
       width: 100%;
@@ -99,6 +119,7 @@ class Rolls extends LitElement {
     super();
     this.rolling = false;
     this.poolDice = [];
+    this.showSymbolNames = false;
     
     // We'll load the pool in connectedCallback for better reliability
   }
@@ -335,21 +356,31 @@ class Rolls extends LitElement {
         <div class="pool-container">
             ${!hasPool ?
                 html`<div class="empty-pool">Click dice above to add them to your pool</div>` :
-                html`<dice-pool .dice=${this.poolDice} @die-removed=${this.handleDieRemoved}></dice-pool>`
+                html`<dice-pool 
+                  .dice=${this.poolDice} 
+                  .showSymbolNames=${this.showSymbolNames} 
+                  @die-removed=${this.handleDieRemoved}></dice-pool>`
             }
         </div>
 
         <div class="action-buttons">
+            <div></div>
+            <div class="center-buttons">
+                <button
+                    class="action-button roll-button"
+                    @click=${this.rollAll}
+                    ?disabled=${!hasPool || this.rolling}
+                >Roll</button>
+                <button
+                    class="action-button clear-button"
+                    @click=${this.clearPool}
+                    ?disabled=${!hasPool || this.rolling}
+                >Clear</button>
+            </div>
             <button
-                class="action-button roll-button"
-                @click=${this.rollAll}
-                ?disabled=${!hasPool || this.rolling}
-            >Roll</button>
-            <button
-                class="action-button clear-button"
-                @click=${this.clearPool}
-                ?disabled=${!hasPool || this.rolling}
-            >Clear</button>
+                class="action-button toggle-button"
+                @click=${() => this.dispatchEvent(new CustomEvent('toggle-display', {bubbles: true, composed: true}))}
+            >${this.showSymbolNames ? 'Names' : 'Symbols'}</button>
         </div>
     `;
   }

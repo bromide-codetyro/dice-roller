@@ -3,7 +3,8 @@ import './dice/dice-pool.js';
 
 class History extends LitElement {
   static properties = {
-    history: { type: Array }
+    history: { type: Array },
+    showSymbolNames: { type: Boolean }
   };
 
   static styles = css`
@@ -83,6 +84,7 @@ class History extends LitElement {
   constructor() {
     super();
     this.history = [];
+    this.showSymbolNames = false;
   }
 
   clearHistory() {
@@ -110,7 +112,11 @@ class History extends LitElement {
           html`<div class="history-list">
             ${this.history.map(entry => html`
               <div class="history-entry">
-                <dice-pool .dice=${entry.rolls.map(r => ({...r, id: Math.random()}))} .static=${true}></dice-pool>
+                <dice-pool 
+                  .dice=${entry.rolls.map(r => ({...r, id: Math.random()}))} 
+                  .static=${true}
+                  .showSymbolNames=${this.showSymbolNames}
+                ></dice-pool>
               </div>
             `)}
           </div>`

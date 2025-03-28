@@ -6,11 +6,13 @@ import './difficulty-die.js';
 import './challenge-die.js';
 import './setback-die.js';
 import './force-die.js';
+import { getSymbolName } from './symbol-names.js';
 
 export class DicePool extends LitElement {
   static properties = {
     dice: { type: Array },
-    static: { type: Boolean } 
+    static: { type: Boolean },
+    showSymbolNames: { type: Boolean }
   };
 
   static styles = css`
@@ -56,9 +58,13 @@ export class DicePool extends LitElement {
       align-items: center;
     }
 
-    .result-group span {
+    .result-group span.symbol {
       font-family: 'SW-FFG';
       font-size: 1.2em;
+    }
+
+    .result-group span.name {
+      font-size: 0.9em;
     }
   `;
 
@@ -66,6 +72,7 @@ export class DicePool extends LitElement {
     super();
     this.dice = [];
     this.static = false;
+    this.showSymbolNames = false;
   }
 
   handleDieClick(die, e) {
@@ -157,34 +164,56 @@ export class DicePool extends LitElement {
       <div class="results">
         ${summary.triumph > 0 ? html`
           <div class="result-group">
-              ${summary.triumph}<span>x</span>
+              ${summary.triumph}
+              ${this.showSymbolNames
+                ? html`<span class="name">${getSymbolName('x')}</span>`
+                : html`<span class="symbol">x</span>`
+              }
           </div>
         ` : ''}
         ${summary.despair > 0 ? html`
           <div class="result-group">
-            ${summary.despair}<span>y</span>
+            ${summary.despair}
+            ${this.showSymbolNames
+              ? html`<span class="name">${getSymbolName('y')}</span>`
+              : html`<span class="symbol">y</span>`
+            }
           </div>
         ` : ''}
         ${summary.netSuccess !== 0 ? html`
           <div class="result-group">
             ${Math.abs(summary.netSuccess)}
-            <span>${summary.netSuccess > 0 ? 's' : 'f'}</span>
+            ${this.showSymbolNames
+              ? html`<span class="name">${getSymbolName(summary.netSuccess > 0 ? 's' : 'f')}</span>`
+              : html`<span class="symbol">${summary.netSuccess > 0 ? 's' : 'f'}</span>`
+            }
           </div>
         ` : ''}
         ${summary.netAdvantage !== 0 ? html`
           <div class="result-group">
             ${Math.abs(summary.netAdvantage)}
-            <span>${summary.netAdvantage > 0 ? 'a' : 't'}</span>
+            ${this.showSymbolNames
+              ? html`<span class="name">${getSymbolName(summary.netAdvantage > 0 ? 'a' : 't')}</span>`
+              : html`<span class="symbol">${summary.netAdvantage > 0 ? 'a' : 't'}</span>`
+            }
           </div>
         ` : ''}
         ${summary.lightside > 0 ? html`
           <div class="result-group">
-            ${summary.lightside}<span>z</span>
+            ${summary.lightside}
+            ${this.showSymbolNames
+              ? html`<span class="name">${getSymbolName('Z')}</span>`
+              : html`<span class="symbol">Z</span>`
+            }
           </div>
         ` : ''}
         ${summary.darkside > 0 ? html`
           <div class="result-group">
-            ${summary.darkside}<span>Z</span>
+            ${summary.darkside}
+            ${this.showSymbolNames
+              ? html`<span class="name">${getSymbolName('z')}</span>`
+              : html`<span class="symbol">z</span>`
+            }
           </div>
         ` : ''}
       </div>

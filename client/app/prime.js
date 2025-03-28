@@ -4,10 +4,28 @@ import './history.js';
 
 class Prime extends LitElement {
   static properties = {
-    history: { type: Array }
+    history: { type: Array },
+    showSymbolNames: { type: Boolean }
   };
 
   static styles = css`
+    .toggle-button {
+      padding: 8px 16px;
+      font-size: 0.9em;
+      background-color: #336699;
+      color: #e0e0e0;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
+    }
+
+    .toggle-button:hover {
+      background-color: #4477aa;
+      box-shadow: 0 0 15px rgba(51, 102, 153, 0.3);
+    }
     .container {
       padding: 20px;
       max-width: 800px;
@@ -49,6 +67,15 @@ class Prime extends LitElement {
       this.history = [];
     }
     
+    // Load showSymbolNames preference from localStorage
+    try {
+      const savedShowSymbolNames = localStorage.getItem('showSymbolNames');
+      this.showSymbolNames = savedShowSymbolNames ? JSON.parse(savedShowSymbolNames) : false;
+    } catch (e) {
+      console.error('Error loading symbol display preference:', e);
+      this.showSymbolNames = false;
+    }
+    
     // Generate bright stars
     this.brightStars = this.generateBrightStars(15);
   }
@@ -71,6 +98,7 @@ class Prime extends LitElement {
   saveState() {
     try {
       localStorage.setItem('diceHistory', JSON.stringify(this.history));
+      localStorage.setItem('showSymbolNames', JSON.stringify(this.showSymbolNames));
     } catch (e) {
       console.error('Error saving state:', e);
     }
@@ -88,6 +116,12 @@ class Prime extends LitElement {
 
   handleHistoryClear() {
     this.history = [];
+    this.saveState();
+    this.requestUpdate();
+  }
+
+  toggleSymbolDisplay() {
+    this.showSymbolNames = !this.showSymbolNames;
     this.saveState();
     this.requestUpdate();
   }
@@ -135,9 +169,10 @@ class Prime extends LitElement {
       `)}
       
       <div class="container">
-        <c-rolls id="dice-roller" @dice-rolled=${this.handleRoll}></c-rolls>
+        <c-rolls id="dice-roller" @dice-rolled=${this.handleRoll} @toggle-display=${this.toggleSymbolDisplay} .showSymbolNames=${this.showSymbolNames}></c-rolls>
         <c-history 
           .history=${this.history}
+          .showSymbolNames=${this.showSymbolNames}
           @clear-history=${this.handleHistoryClear}>
         </c-history>
       </div>

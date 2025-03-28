@@ -377,7 +377,7 @@ class Rolls extends LitElement {
 
         <div class="pool-container">
             ${!hasPool ?
-                html`<div class="empty-pool">Click dice above to add them to your pool</div>` :
+                html`<div class="empty-pool">Click dice above to add them to your pool.<br>Click dice in the pool to remove them.</div>` :
                 html`<dice-pool 
                   .dice=${this.poolDice} 
                   .showSymbolNames=${this.showSymbolNames} 

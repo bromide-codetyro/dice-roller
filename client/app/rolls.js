@@ -40,6 +40,7 @@ class Rolls extends LitElement {
       gap: 10px;
       justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
     }
 
     .center-buttons {
@@ -47,6 +48,27 @@ class Rolls extends LitElement {
       gap: 10px;
       justify-content: center;
       flex-grow: 1;
+      min-width: 200px;
+    }
+    
+    /* Ensure buttons have minimum width and shrink appropriately */
+    .action-button {
+      min-width: 80px;
+      flex-shrink: 1;
+    }
+    
+    /* On small screens, align buttons and adjust layout */
+    @media (max-width: 480px) {
+      .action-buttons {
+        justify-content: center;
+      }
+      
+      .toggle-button {
+        order: 3;
+        margin-top: 10px;
+        width: 100%;
+        max-width: 200px;
+      }
     }
 
     .action-button {
@@ -364,7 +386,6 @@ class Rolls extends LitElement {
         </div>
 
         <div class="action-buttons">
-            <div></div>
             <div class="center-buttons">
                 <button
                     class="action-button roll-button"
